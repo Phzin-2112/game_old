@@ -1,0 +1,131 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <iomanip>
+
+using namespace std;
+
+const int tamanho = 3;
+char matriz[tamanho][tamanho];
+ 
+//função que cria o tabuleiro
+void show() {
+    cout << "   ";
+    for (int j = 0; j < tamanho; j++) {
+        cout << setw(3) << j + 1 << " ";
+    }
+    cout << endl;
+
+    for (int i = 0; i < tamanho; i++) {
+        cout << " " << static_cast<char>('A' + i) << "  ";
+        for (int j = 0; j < tamanho; j++) {
+            cout << " " << matriz[i][j] << "  ";
+        }
+        cout << endl;
+    }
+}
+
+//função que verifica a vitória
+bool verificarVitoria(char jogador) {
+    for (int i = 0; i < tamanho; i++) {
+        if ((matriz[i][0] == jogador && matriz[i][1] == jogador && matriz[i][2] == jogador) || 
+            (matriz[0][i] == jogador && matriz[1][i] == jogador && matriz[2][i] == jogador)) {
+            return true;
+        }
+    }
+    if ((matriz[0][0] == jogador && matriz[1][1] == jogador && matriz[2][2] == jogador) || 
+        (matriz[0][2] == jogador && matriz[1][1] == jogador && matriz[2][0] == jogador)) {
+        return true;
+    }
+
+    return false;
+}
+
+//função que verifica empate 
+bool verificarEmpate() {
+    for (int i = 0; i < tamanho; i++) {
+        for (int j = 0; j < tamanho; j++) {
+            if (matriz[i][j] == '-') {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+//função jogar 
+void jogar() {
+    string entrada;
+    char jogadorAtual = 'X';
+    int jogadas = 0;
+
+    while (true) {
+        cout << jogadorAtual << ", digite a coordenada (ex: A3): ";
+        cin >> entrada;
+
+        if (entrada.length() < 2) {
+            cout << "Coordenada invalida. Tente novamente.\n";
+            continue;
+        }
+
+        char letra = toupper(entrada[0]);
+        string numStr = entrada.substr(1);
+
+        int linha = letra - 'A';
+        int coluna;
+
+        try {
+            coluna = stoi(numStr) - 1;
+        } catch (...) {
+            cout << "Número invalido. Tente novamente.\n";
+            continue;
+        }
+
+        if (linha < 0 || linha >= tamanho || coluna < 0 || coluna >= tamanho) {
+            cout << "Coordenada fora do tabuleiro. Tente novamente.\n";
+            continue;
+        }
+
+        if (matriz[linha][coluna] != '-') {
+            cout << "Essa posição já foi ocupada. Tente novamente.\n";
+            continue;
+        }
+
+        matriz[linha][coluna] = jogadorAtual;
+        jogadas++;
+
+        show();
+
+        if (verificarVitoria(jogadorAtual)) {
+            cout << "\nJogador 1 venceu!\n";
+            break;
+        } else{
+            cout << "\nJogador 2 venceu!\n";
+        }
+
+        if (verificarEmpate()) {
+            cout << "\nEmpate! O jogo terminou sem vencedor.\n";
+            break;
+        }
+
+        jogadorAtual = (jogadorAtual == 'X') ? 'O' : 'X';
+    }
+}
+
+//função de ponto de partida 
+int main() {
+    srand(time(0));
+    
+    for (int i = 0; i < tamanho; i++) {
+        for (int j = 0; j < tamanho; j++) {
+            matriz[i][j] = '-';
+        }
+    }
+
+    cout << "     JOGO DA VELHA...\n\n";
+    show();
+    jogar();
+
+    cout << "\nObrigado por jogar!\n";
+    return 0;
+}
